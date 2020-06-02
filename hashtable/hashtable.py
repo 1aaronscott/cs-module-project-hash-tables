@@ -108,7 +108,7 @@ class HashTable:
             else:  # add the new key/value pair
                 cur.next = HashTableEntry(key, value)
 
-        # auto resize if load factor too big after deleting
+        # auto resize if load factor too big after adding
         if self.get_load_factor() > .7:
             self.resize(self.capacity*2)
 
@@ -183,12 +183,16 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        # make list of all values in current hash list
         all_values = [value for value in self.hash_list if value is not None]
+        # set the new hash list size and re-initialize the list
         self.capacity = new_capacity
         self.hash_list = [None]*new_capacity
         while all_values:  # loop until list is empty
+            # take first value and put into new hash list
             cur = all_values.pop()
             self.put(cur.key, cur.value)
+            # process remaining values
             while cur.next is not None:
                 cur = cur.next
                 self.put(cur.key, cur.value)
