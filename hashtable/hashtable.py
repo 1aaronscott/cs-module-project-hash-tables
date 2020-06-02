@@ -47,6 +47,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        return len([item for item in self.hash_list if item is not None]) / self.capacity
 
     def fnv1(self, key):
         """
@@ -91,8 +92,22 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        self.hash_list[self.hash_index(key)] = value
-        return
+        #self.hash_list[self.hash_index(key)] = value
+
+        # determine where the hash shoud go
+        slot = self.hash_index(key)
+        # if that spot is empty, put it in
+        if self.hash_list[slot] is None:
+            self.hash_list[slot] = HashTableEntry(key, value)
+        else:  # there's a collision!
+            cur = self.hash_list[slot]
+            while cur.next is not None and cur.key != key:
+                current = cur.next
+            if cur.key == key:  # replace with new value
+                cur.value = value
+            else:  # add the new key/value pair
+                cur.next = HashTableEntry(key, value)
+        return self
 
     def delete(self, key):
         """
@@ -103,12 +118,26 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        try:
-            self.hash_list[self.hash_index(key)] = None
-        except:
+        slot = self.hash_index(key)
+        cur = self.hash_list[slot]
+        if cur is None:
             print("Couldn't find that key!")
+        elif cur.key == key:
+            self.hash_list[slot] = cur.next
+        else:
+            while cur.next.key != key and cur.next is not None:
+                cur = cur.next
+            if cur.next.key == key:
+                cur.next = cur.next.next
+            else:
+                print("Couldn't find that key!")
 
-        return
+        # try:
+        #     self.hash_list[slot] = None
+        # except:
+        #     print("Couldn't find that key!")
+
+        return self
 
     def get(self, key):
         """
