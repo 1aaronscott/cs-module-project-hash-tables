@@ -102,11 +102,16 @@ class HashTable:
         else:  # there's a collision!
             cur = self.hash_list[slot]
             while cur.next is not None and cur.key != key:
-                current = cur.next
+                cur = cur.next
             if cur.key == key:  # replace with new value
                 cur.value = value
             else:  # add the new key/value pair
                 cur.next = HashTableEntry(key, value)
+
+        # auto resize if load factor too big after deleting
+        if self.get_load_factor() > .7:
+            self.resize(self.capacity*2)
+
         return self
 
     def delete(self, key):
@@ -120,17 +125,21 @@ class HashTable:
         # Your code here
         slot = self.hash_index(key)
         cur = self.hash_list[slot]
-        if cur is None:
+        if cur is None:  # can't find the key
             print("Couldn't find that key!")
-        elif cur.key == key:
+        elif cur.key == key:  # if pointing to key to delete, skip over and point to next
             self.hash_list[slot] = cur.next
-        else:
+        else:  # traverse the list until we find the key and skip over it
             while cur.next.key != key and cur.next is not None:
                 cur = cur.next
             if cur.next.key == key:
                 cur.next = cur.next.next
             else:
                 print("Couldn't find that key!")
+
+        # auto resize if load factor too small after deleting
+        if self.get_load_factor() < .2:
+            self.resize(self.capacity//2)
 
         # try:
         #     self.hash_list[slot] = None
@@ -148,8 +157,18 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        # try:
+        #     return self.hash_list[self.hash_index(key)]
+        # except:
+        #     return None
+        slot = self.hash_index(key)
         try:
-            return self.hash_list[self.hash_index(key)]
+            if self.hash_list[slot] is not None:
+                cur = self.hash_list[slot]
+
+                while cur.key != key:
+                    cur = cur.next
+                return cur.value
         except:
             return None
 
@@ -161,6 +180,17 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        all_values = [value for value in self.hash_list if value is not None]
+        self.capacity = new_capacity
+        self.hash_list = [None]*new_capacity
+        while all_values:  # loop until list is empty
+            cur = all_values.pop()
+            self.put(cur.key, cur.value)
+            while cur.next is not None:
+                cur = cur.next
+                self.put(cur.key, cur.value)
+
+        return self
 
 
 if __name__ == "__main__":
