@@ -137,9 +137,12 @@ class HashTable:
             else:
                 print("Couldn't find that key!")
 
-        # auto resize if load factor too small after deleting
+        # auto resize if load factor too small after deleting down to a min of 8
         if self.get_load_factor() < .2:
+            if self.capacity > 16:
             self.resize(self.capacity//2)
+        else:
+            self.resize(8)
 
         # try:
         #     self.hash_list[slot] = None
