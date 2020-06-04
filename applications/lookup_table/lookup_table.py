@@ -1,6 +1,7 @@
 # Your code here
 import math
 import random
+# declare global hence reusable dict cache
 lut = {}
 
 
@@ -23,6 +24,7 @@ def slowfun(x, y):
         v = math.pow(x, y)
         v = math.factorial(v)
         v //= (x+y)
+        # store result for x,y pair in lookup table
         lut[(x, y)] = v % 982451653
     return lut
 
